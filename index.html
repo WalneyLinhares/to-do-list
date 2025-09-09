@@ -1,11 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-    
+    <div class="container">
+        <div class="title">
+            <h1>TO DO LIST</h1>
+        </div>
+
+        <form class="form">
+            <input id="input-tarefa" type="text" name="tarefa" placeholder="Escreva uma tarefa aqui...">
+
+            <input type="button" value="Adicionar">
+        </form>
+
+        <div class="container-tarefas">
+            <div class="tarefas">
+                <label>
+                    <input type="checkbox" name="checkbox">
+                    <span class="checkbox" style="--checkbox-color: red"></span>
+                    <p><span>Ja pode aumossar?</span></p>
+                </label>
+
+                <div class="buttons">
+                    <button class="btn-excluir"><i class="fa-solid fa-x"></i></button>
+                    <button class="btn-editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                </div>
+            </div>
+        
+        </div>
+        
+    </div>
 </body>
 </html>
