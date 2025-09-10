@@ -16,11 +16,11 @@ body {
 .container {
     background-color: white;
     padding: 1rem;
-    width: 40%;
+    width: 30%;
     min-width: 500px;
     border: 2px solid black;
     box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.356);
-    max-height: 705px;
+    max-height: 730px;
     overflow: hidden;
 
     display: flex;
@@ -107,6 +107,7 @@ body {
     cursor: pointer;
 
     transition: background-color .5s;
+    flex-shrink: 0;
 }
 
 .tarefas label p {
@@ -118,6 +119,7 @@ body {
 .tarefas label p span {
     display: inline-block;
     position: relative;
+    padding: .2rem;
 }
 
 .tarefas label p span::after {
@@ -167,4 +169,26 @@ body {
 
 .btn-editar {
     background-color: #00b7ff;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+
+::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    
+    
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #000000; 
+    border: 3px solid #f0f0f0;
+    
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
 }
