@@ -2,19 +2,29 @@
 const container = document.getElementById("container-tarefas");
 const input = document.getElementById("input-tarefa");
 const btnAdd = document.getElementById("btn-add");
+const tarefasTotal = document.getElementById('tarefas-total')
+const tarefasConcluidas = document.getElementById('tarefas-concluidas')
 
 // ======= DADOS =======
 let tarefas = [];
 let corAtual = 0;
 
+// ATUALIZAR CONTADOR DAS TAREFAS
+function atualizarContador() {
+    tarefasTotal.textContent = tarefas.length;
+    tarefasConcluidas.textContent = tarefas.reduce((cont, t) => t.completa ? cont + 1 : cont, 0);
+}
+
 // ======= LOCAL STORAGE =======
 function salvarLocalStorage() {
     localStorage.setItem('tarefas', JSON.stringify(tarefas));
+    atualizarContador();
 }
 
 function carregarLocalStorage() {
     tarefas = JSON.parse(localStorage.getItem('tarefas') || '[]');
     tarefas.forEach(tarefa => criarTarefaDOM(tarefa));
+    atualizarContador();
 }
 
 // ======= CORES =======
@@ -75,7 +85,7 @@ const adicionar = (event) => {
     if (event.type === 'click' || event.key === 'Enter') {
         if (event.key === 'Enter') event.preventDefault();
         const titulo = input.value.trim();
-        if (titulo) {
+        if (titulo && titulo.length < 100) {
             adicionarTarefa(titulo);
             input.value = '';
         }
@@ -121,7 +131,7 @@ container.addEventListener('click', (e) => {
         spanTitulo.addEventListener('blur', finalizarEdicao);
     }
 
-    // MARCAR DESMARCAR
+    // MARCAR DESMARCAR CHECKBOX
     if (e.target.closest('input[type="checkbox"]')) {
         tarefa.completa = e.target.checked;
         salvarLocalStorage();
