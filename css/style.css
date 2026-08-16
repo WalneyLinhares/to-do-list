@@ -5,9 +5,13 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
 }
 
+:root {
+    --primary-background-color: #ffffff;
+}
+
 body {
     height: 100vh;
-    background-color: #f0efef;
+    background-color: var(--primary-background-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -15,13 +19,14 @@ body {
 }
 
 .container {
-    background-color: white;
+    background-color: var(--primary-background-color);
     padding: 1rem;
-    width: 30%;
+    width: 90%;
     min-width: 350px;
+    max-width: 500px;
+    max-height: 750px;
     border: 2px solid black;
     box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.356);
-    max-height: 730px;
     overflow: hidden;
 
     display: flex;
@@ -65,11 +70,11 @@ body {
 }
 
 .form input[type="text"]:focus {
-    border: 2px solid black;
+    outline: 2px solid black;
 }
 
 .form input[type="button"]:hover {
-    background-color: #03ff18;
+    background-color: #01b306;
 }
 
 .container-tarefas {
@@ -87,7 +92,7 @@ body {
     align-items: center;
 }
 
-.tarefas:nth-child(even) label p {
+.tarefas:nth-child(even) .container-title {
     background-color: #00b7ff18;
 }
 
@@ -101,48 +106,60 @@ body {
 }
 
 .checkbox {
+    --cor-tema: #000000;
+
     width: 15px;
     height: 15px;
-    border: 2px solid var(--checkbox-color, #00b7ff);
-    box-shadow: 2px 2px 1px var(--checkbox-color, #00b7ff);
+    border: 2px solid var(--cor-tema);
+    box-shadow: 2px 2px 1px var(--cor-tema);
     cursor: pointer;
+    caret-color: transparent;
 
     transition: background-color .5s;
     flex-shrink: 0;
 }
 
-.tarefas label p {
+.container-title {
     border-bottom: 1px solid black;
     flex-grow: 1;
     padding: 0.3rem;
 }
 
-.tarefas label p span {
+.task-title{
     display: inline-block;
     position: relative;
     padding: .2rem;
     word-wrap: break-word;
     word-break: break-word;
+    opacity: 1;
+    font-weight: bold;
+
+    transition: opacity .5s ease;
 }
 
-.tarefas label p span::after {
+.task-title::after {
     content: "";
     position: absolute;
     left: 0;
     top: 55%;
-    width: 0%;
+    width: 0;
     height: 1px;
     background: black;
+    opacity: 1;
     
-    transition: width 0.5s ease;
+    transition: width .5s ease;
 }
 
-.tarefas label:has(input:checked) p span::after {
+.tarefas label:has(input:checked) > .container-title .task-title::after {
     width: 100%;
 }
 
-.tarefas label > input[type="checkbox"]:checked + span {
-    background-color: var(--checkbox-color);
+.tarefas label:has(input:checked) > .container-title .task-title{
+    opacity: 0.5;
+}
+
+.tarefas label:has(input[type="checkbox"]:checked) > .checkbox {
+    background-color: var(--cor-tema);
 }
 
 .tarefas label > input[type="checkbox"] {
@@ -152,6 +169,7 @@ body {
 .buttons {
     display: flex;
     gap: .3rem;
+    caret-color: transparent;
 }
 
 .buttons > button {
@@ -180,24 +198,18 @@ body {
     font-size: 1.1rem;
 }
 
-
-
 ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
 }
 
-
 ::-webkit-scrollbar-track {
     background: #f0f0f0;
-    
-    
 }
 
 ::-webkit-scrollbar-thumb {
     background-color: #000000; 
     border: 3px solid #f0f0f0;
-    
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -212,3 +224,53 @@ footer {
     color: white;
     text-align: center;
 }
+
+.button-block {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.janela-muda-cor {
+    position: fixed;
+    background-color: var(--primary-background-color);
+    padding: 0.2rem;
+    min-width: 150px;
+    border: 2px solid black;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.356);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.janela-muda-cor h2 {
+    font-size: 1rem;
+    text-align: center;
+    text-transform: capitalize;
+}
+
+.janela-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    grid-template-rows: repeat(3, auto);
+    gap: 0.5rem; /* Espaço entre os itens */
+    place-items: center;
+    padding: 0.5rem;
+}
+
+.janela-container span:hover {
+    background-color: var(--cor-tema);
+}
+
+.cor-orange { --cor-tema: #FFA500; }
+.cor-purple { --cor-tema: #836FFF; }
+.cor-cyan   { --cor-tema: #00BFFF; }
+.cor-green  { --cor-tema: #00FA9A; }
+.cor-pink   { --cor-tema: #FF69B4; }
+.cor-red    { --cor-tema: #FF0000; }
+.cor-yellow { --cor-tema: #FFFF00; }
+.cor-blue   { --cor-tema: #274aff; }
+.cor-black { --cor-tema: #000000; }
