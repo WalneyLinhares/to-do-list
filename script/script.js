@@ -1,446 +1,327 @@
-function ListApp() {
-    this.createElements = function({ element, text, classNames = [], attributes = {} }) {
-        const el = document.createElement(element);
+class Task {
+    constructor(data) {
+        this.id = data.id;
+        this.title = data.title;
+        this.isCompleted = data.isCompleted;
+        this.color = data.color;
+    }
+}
 
-        if (text) el.textContent = text;
+class TaskManager {
+    #tasks = [];
+    #colorsClass = ['cor-orange', 'cor-purple', 'cor-cyan', 'cor-green',
+        'cor-pink', 'cor-red', 'cor-yellow', 'cor-blue', 'cor-black'];
 
-        if (Array.isArray(classNames)) {
-            classNames.forEach(className => {
-                if (className) el.classList.add(className);
-            });
-        }
-
-        Object.entries(attributes).forEach(([key, value]) => {
-            if (key in el) {
-                el[key] = value;
-            } else {
-                el.setAttribute(key, String(value));
-            }
-        });
-
-        return el;
+    constructor() {
+        this.#loadFromLocalStorage();
     }
 
-    this.getClassColorCheckbox = function(range) {
-        const currentColor = range;
-        currentNumberColor = (range + 1) % colors.length;
-
-        return colors[currentColor]
+    addTask(task) {
+        this.#tasks.push(task);
+        this.#saveToLocalStorage();
     }
 
-    this.createTask = function(title, taskId = null, completeTask = false, colorTask = null) {
-        const colorNumberSave = colorTask ? colorTask : currentNumberColor;
-        const classColor = this.getClassColorCheckbox(colorNumberSave);
-        const idTask = taskId || crypto.randomUUID();
-        let completeTaskClass = completeTask ? ['btn-editar', 'button-block'] : ['btn-editar'];
-        const nodes = {}
-
-        // 1. Cria a Div Principal da Tarefa
-        nodes.li = this.createElements({
-            element: 'li',
-            classNames: ['tarefas'],
-            attributes: { 'data-id': idTask }
-        });
-
-        // 2. Cria o Label e o Checkbox
-        nodes.label = this.createElements({ element: 'label' });
-
-        nodes.checkbox = this.createElements({
-            element: 'input',
-            attributes: {
-                type: 'checkbox',
-                checked: completeTask
-            }
-        });
-
-        // 3. Cria o Span customizado com a cor da tarefa
-        nodes.span = this.createElements({
-            element: 'span',
-            classNames: ['checkbox', classColor],
-        });
-
-        // 4. Cria o Parágrafo
-        nodes.divTitle = this.createElements({
-            element: 'div',
-            classNames: ['container-title'],
-        });
-
-        nodes.pTitle = this.createElements({
-            element: 'p',
-            text: title,
-            classNames: ['task-title'],
-            attributes: { 'tabIndex': 0 }
-        });
-
-        // 5. Cria a Div dos Botões e os Botões de Ação
-        nodes.divButtons = this.createElements({
-            element: 'div',
-            classNames: ['buttons']
-        });
-
-        nodes.btnExcluir = this.createElements({
-            element: 'button',
-            classNames: ['btn-excluir'],
-        });
-
-        nodes.iExcluir = this.createElements({
-            element: 'i',
-            classNames: ['fa-solid', 'fa-x'],
-        });
-
-        nodes.btnEditar = this.createElements({
-            element: 'button',
-            classNames: completeTaskClass,
-        });
-
-        nodes.iEditar = this.createElements({
-            element: 'i',
-            classNames: ['fa-solid', 'fa-pen-to-square'],
-        });
-
-        nodes.idTask = idTask;
-        nodes.completeTask = completeTask;
-        nodes.color  = colorNumberSave;
-
-        return nodes;
+    removeTask(taskId) {
+        this.#tasks = this.#tasks.filter(task => task.id !== taskId);
+        this.#saveToLocalStorage();
     }
 
+    editTitle(taskId, newTitle) {
+        const task = this.#tasks.find(t => t.id === taskId);
 
-    this.clearFocus = function(el) {
-        el.value = '';
-        el.focus();
-    }
-
-
-    this.addTask = function(title) {
-        const tasksCreate = this.createTask(title);
-        const { idTask, completeTask, color } = tasksCreate;
-        this.renderTask(tasksCreate);
-
-        this.saveTaskStorage(title, idTask, completeTask, color);
-        this.updateTaskCount();
-    }
-
-    this.renderTask = function(object) {
-        if (object) {
-            const listTask = document.getElementById('container-tarefas');
-            const { li, label, checkbox, span, divTitle, pTitle, divButtons,
-                btnExcluir, iExcluir, btnEditar, iEditar } = object;
-
-            divTitle.append(pTitle);
-            label.append(checkbox, span, divTitle);
-
-            btnExcluir.append(iExcluir);
-            btnEditar.append(iEditar);
-            divButtons.append(btnEditar, btnExcluir);
-
-            li.append(label, divButtons);
-            listTask.append(li);
-        }
-    }
-
-
-    this.removeTask = function(element, elementFather) {
-        const fatherElement = element.closest(elementFather);
-
-        if (!fatherElement) return;
-
-        const dataId = fatherElement.dataset.id;
-
-        if (dataId) {
-            this.deleteTaskStorage(dataId);
-        }
-
-        fatherElement.remove();
-        this.updateTaskCount();
-    }
-
-
-    this.getStorageTasks = function() {
-        return JSON.parse(localStorage.getItem('tasks')) || [];
-    }
-
-
-    this.saveLocalStorage = function() {
-        localStorage.setItem('tasks', JSON.stringify(storageListTask));
-    }
-
-
-    this.saveTaskStorage = function(titleTask, idTask, completeTask, colorTask) {
-        const newTask = {
-            title: titleTask,
-            id: idTask,
-            complete: completeTask !== null ? completeTask : false,
-            colorTask: colorTask !== null ? colorTask : 0
-        };
-        storageListTask.push(newTask);
-        this.saveLocalStorage();
-
-        this.updateTaskCount();
-    }
-
-
-
-    this.deleteTaskStorage = function(idTask) {
-        storageListTask = storageListTask.filter(task => task.id !== idTask);
-        this.saveLocalStorage();
-    }
-
-
-    this.toggleTaskCompleteStorage = function(idTask) {
-        const task = storageListTask.find(t => t.id === idTask);
         if (task) {
-            task.complete = !task.complete;
-            this.saveLocalStorage();
+            task.title = newTitle;
+            this.#saveToLocalStorage();
         }
     }
 
+    taskToggleCompleted(taskId) {
+        const task = this.#tasks.find(t => t.id === taskId);
 
-    this.selectionRange = function(el) {
+        if (task) {
+            task.isCompleted = !task.isCompleted;
+            this.#saveToLocalStorage();
+        }
+    }
+
+    changeTaskColor(taskId, newColorIndex) {
+        const task = this.#tasks.find(t => t.id === taskId);
+        if (task) {
+            task.color = newColorIndex;
+            this.#saveToLocalStorage();
+        }
+    }
+
+    getTasks() {
+        return this.#tasks;
+    }
+
+    #saveToLocalStorage() {
+        localStorage.setItem('@taskApp:tasks', JSON.stringify(this.#tasks));
+    }
+
+    #loadFromLocalStorage() {
+        const savedData = localStorage.getItem('@taskApp:tasks');
+
+        if (!savedData) return;
+
+        const rawTasks = JSON.parse(savedData);
+        this.#tasks = rawTasks.map(data => new Task(data));
+    }
+
+    get colorsList() {
+        return this.#colorsClass;
+    }
+
+    get totalTasks() {
+        return this.#tasks.length;
+    }
+
+    get tasksIsComplete() {
+        return this.#tasks.reduce((total, task) => task.isCompleted ? total + 1 : total, 0);
+    }
+
+    get taskColor() {
+        let currentColor = this.getTasks().length;
+        return currentColor % this.#colorsClass.length;
+    }
+
+    taskColorClass(color) {
+        return this.#colorsClass[color];
+    }
+}
+
+class TaskPanel  {
+    constructor(taskManager) {
+        this.taskManager = taskManager;
+        this.form = document.querySelector('.form');
+        this.inputTarefa = document.querySelector('#input-tarefa');
+        this.tasksContainer = document.querySelector('#container-tarefas');
+        this.totalTasks = document.querySelector('#tarefas-total');
+        this.tasksCompleted = document.querySelector('#tarefas-concluidas');
+        this.colorModal = new ColorPickerModal(
+            this.taskManager.colorsList,
+            (taskId, colorIndex) => {
+                this.taskManager.changeTaskColor(taskId, colorIndex);
+                this.renderTasks();
+            }
+        );
+    }
+
+    init() {
+        this.form.addEventListener('submit', (event) => this.formToAdd(event));
+        this.tasksContainer.addEventListener('click', (event) => this.eventsClick(event));
+        this.tasksContainer.addEventListener('keydown', (event) => this.eventsKeys(event));
+        this.tasksContainer.addEventListener('focusout', (event) => this.handleTitleBlur(event));
+        this.tasksContainer.addEventListener('contextmenu', (event) => this.handleContextMenu(event));
+        this.colorModal.init();
+        this.renderTasks();
+    }
+
+    formToAdd(event) {
+        event.preventDefault();
+
+        if (this.inputTarefa.value.trim() === '') return;
+
+        const newTask = {
+            id: crypto.randomUUID(),
+            title: this.inputTarefa.value,
+            isCompleted: false,
+            color: this.taskManager.taskColor,
+        }
+
+        this.taskManager.addTask(newTask);
+        this.renderTasks();
+        this.form.reset();
+    }
+
+    eventsClick(event) {
+        const el = event.target;
+
+        // Botão editar
+        if (el.closest('.btn-editar')) {
+            const father = el.closest(".tarefas");
+            const titleEdit = father.querySelector('.task-title')
+
+            titleEdit.contentEditable = true;
+            titleEdit.focus()
+            this.selectionRange(titleEdit);
+        }
+
+        // Botão remover
+        if (el.closest('.btn-excluir')) {
+            const fatherElement = el.closest('li');
+            if (!fatherElement) return;
+            const dataId = fatherElement.dataset.id;
+
+            if (dataId) { this.taskManager.removeTask(dataId) }
+
+            this.renderTasks();
+        }
+
+        // Botão checkbox
+        if (el.closest('input[type="checkbox"]')) {
+            const father = el.closest(".tarefas");
+            const buttonBlock = father.querySelector('.btn-editar');
+            const dataId = father.getAttribute('data-id');
+
+            if (buttonBlock) {
+                buttonBlock.classList.toggle('button-block');
+                this.taskManager.taskToggleCompleted(dataId);
+            }
+
+            this.renderTasksCount();
+        }
+
+    }
+
+    eventsKeys(event) {
+        const el = event.target;
+
+        if (event.key === 'Enter' && el.classList.contains('task-title')) {
+            event.preventDefault();
+            el.blur();
+        }
+    }
+
+    handleTitleBlur(event) {
+        const el = event.target;
+
+        if (el.classList.contains('task-title') && el.isContentEditable) {
+            el.contentEditable = false;
+            const father = el.closest('.tarefas');
+            const taskId = father.dataset.id;
+            const newTitle = el.innerText.trim();
+
+            if (newTitle) {
+                this.taskManager.editTitle(taskId, newTitle);
+            } else {
+                this.renderTasks();
+            }
+        }
+    }
+
+    handleContextMenu(event) {
+        const fatherElement = event.target.closest('.tarefas');
+
+        if (fatherElement) {
+            event.preventDefault();
+
+            const taskId = fatherElement.dataset.id;
+            const x = event.clientX;
+            const y = event.clientY;
+
+            this.colorModal.open(x, y, taskId);
+        }
+    }
+
+    selectionRange(el) {
         const range = document.createRange();
         const selection = window.getSelection();
 
         range.selectNodeContents(el);
         range.collapse(false);
-
         selection.removeAllRanges();
         selection.addRange(range);
     }
 
+    renderTasks() {
+        this.tasksContainer.innerHTML = '';
+        const tasks = this.taskManager.getTasks();
 
-    this.editTask = function(el) {
-        const father = el.closest(".tarefas");
-        const titleEdit = father.querySelector('.task-title')
+        tasks.forEach((task) => {
+            const li = document.createElement('li');
+            li.classList.add('tarefas');
+            li.dataset.id = task.id;
 
-        titleEdit.contentEditable = true;
-        titleEdit.focus()
+            li.innerHTML = `
+            <label>
+                <input type="checkbox" ${task.isCompleted ? 'checked' : ''}>
+                <span class="checkbox ${this.taskManager.taskColorClass(task.color)}"></span>
+                <div class="container-title">
+                    <p class="task-title">${task.title}</p>
+                </div>
+            </label>
+            <div class="buttons">
+                <button class="btn-editar ${task.isCompleted ? 'button-block' : ''}">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </button>
 
-        this.selectionRange(titleEdit);
-    }
+                <button class="btn-excluir"> <i class="fa-solid fa-x"></i> </button>
+            </div>
+            `;
 
-    this.editTaskTitle = function(idTask, newTitle) {
-        const task = storageListTask.find(t => t.id === idTask);
-        if (task) {
-            task.title = newTitle;
-            this.saveLocalStorage();
-        }
-    }
-
-    this.editColorCheckbox = function(classColorList) {
-        const lastElementClick = lastCheckboxclicked.taskInfo;
-
-        lastElementClick.element.className = classColorList.value;
-
-        const task = storageListTask.find(t => t.id === lastElementClick.id);
-        const colorIndice = colors.indexOf(classColorList[1]);
-
-        if (task && colorIndice !== -1) {
-            task.colorTask = colorIndice;
-            this.saveLocalStorage();
-        }
-
-        const window = this.returnElement('.janela-muda-cor')
-        if (window) window.remove();
-    }
-
-
-    this.completeTask = function(el) {
-        const father = el.closest(".tarefas");
-        const buttonBlock = father.querySelector('.btn-editar');
-        const dataId = father.getAttribute('data-id');
-
-        if (buttonBlock) {
-            buttonBlock.classList.toggle('button-block');
-            this.toggleTaskCompleteStorage(dataId);
-        }
-        this.updateTaskCount();
-    }
-
-
-    this.updateTaskCount = function() {
-        const completedCount = storageListTask.reduce((acc, task) => task.complete ? acc + 1 : acc, 0);
-
-        if (elementCompleted) elementCompleted.textContent = String(completedCount);
-        if (elementTotal) elementTotal.textContent = String(storageListTask.length);
-    }
-
-
-    this.eventsClick = function(e) {
-        const el = e.target;
-        const windowCor = this.returnElement('.janela-muda-cor');
-
-        if (el.classList.contains('btn-add-tarefa')) {
-            e.preventDefault();
-            const inputTask = document.getElementById("input-tarefa");
-            const inputValue = inputTask.value.trim();
-
-            if (inputValue === "") return;
-
-            this.addTask(inputValue);
-            this.clearFocus(inputTask);
-        }
-
-        if (el.closest('.btn-editar')) {
-            this.editTask(el);
-        }
-
-        if (el.closest('.btn-excluir')) {
-            this.removeTask(el, 'li');
-        }
-
-        if (el.closest('input[type="checkbox"]')) {
-            this.completeTask(el);
-        }
-
-        if (windowCor && !windowCor.contains(el)) {
-            windowCor.remove();
-        }
-
-        if (windowCor && el.classList.contains('checkbox')) {
-            const elementClass = el.classList
-            this.editColorCheckbox(elementClass);
-        }
-    }
-
-
-    this.eventsKeys = function(e) {
-        const el = e.target;
-
-        if (e.key === 'Enter' && el.id === 'input-tarefa') {
-            e.preventDefault();
-
-            const inputValue = el.value.trim();
-
-            if (!inputValue) return;
-
-            this.addTask(inputValue);
-            this.clearFocus(el);
-        }
-
-        if (e.key === 'Enter' && el.classList.contains('task-title')) {
-            e.preventDefault();
-
-            const father = el.closest('.tarefas');
-            const idTask = father.dataset.id;
-            const newTitle = el.innerText.trim();
-
-            el.contentEditable = false;
-
-            this.editTaskTitle(idTask, newTitle);
-            el.blur();
-        }
-    }
-
-
-    this.eventsClickMenu = function(e) {
-        const el = e.target;
-        e.preventDefault();
-        console.log(el)
-
-        if (el.classList.contains('checkbox')) {
-            const elementFather = el.closest('.tarefas');
-            const idTask = elementFather.dataset.id;
-            lastCheckboxclicked.taskInfo = { id: idTask, element: el };
-
-            const rect = el.getBoundingClientRect();
-            this.windowColor(rect);
-        }
-    }
-
-
-    this.returnElement = function(el) {
-        return document.querySelector(el);
-    }
-
-
-    this.loadTaskStorage = function() {
-        let isColorApplied = false
-
-        for (const task of storageListTask) {
-            if (!isColorApplied) {
-                currentNumberColor = task.colorTask;
-                isColorApplied = true;
-            }
-
-            const tasksCreate = this.createTask(task.title, task.id, task.complete, task.colorTask);
-            this.renderTask(tasksCreate);
-        }
-
-        this.updateTaskCount();
-    }
-
-
-    this.createWindowColor = function() {
-        const nodes = {}
-
-        nodes.div = this.createElements({
-            element: 'div',
-            classNames: ['janela-muda-cor'],
+            this.tasksContainer.appendChild(li);
         });
 
-        nodes.h2 = this.createElements({
-            element: 'h2',
-            text: 'Cores'
-        });
-
-        nodes.div2 = this.createElements({
-            element: 'div',
-            attributes: {
-                className: 'janela-container'
-            }
-        });
-
-        for (const cor of colors) {
-            nodes[`span_${cor}`] = this.createElements({
-                element: 'span',
-                classNames: ['checkbox',cor],
-            });
-        }
-
-        return nodes;
+        this.renderTasksCount();
     }
 
-    this.renderWindowColor = function(rect, object) {
-        const { div, h2, div2, ...rest } = object;
-        const elements = Object.values(rest);
-
-        div.appendChild(h2);
-        div.appendChild(div2);
-
-        for (const el of elements) {
-            div2.appendChild(el);
-        }
-
-        document.body.appendChild(div);
-
-        div.style.top = `${rect.top}px`;
-        div.style.left = `${rect.left + 20}px`;
-
+    renderTasksCount() {
+        this.totalTasks.textContent = String(taskManager.totalTasks);
+        this.tasksCompleted.textContent = String(taskManager.tasksIsComplete);
     }
-
-    this.windowColor = function(rect) {
-        const window = document.querySelector('.janela-muda-cor');
-
-        if (window) window.remove();
-
-        const nodes = this.createWindowColor();
-        this.renderWindowColor(rect, nodes);
-    }
-
-    this.init = function() {
-        document.addEventListener('click', (e) => this.eventsClick(e));
-        document.addEventListener('keydown', (e) => this.eventsKeys(e));
-        document.addEventListener('contextmenu', (e) => this.eventsClickMenu(e));
-        this.loadTaskStorage();
-    }
-
-    const colors = ['cor-orange', 'cor-purple', 'cor-cyan', 'cor-green', 'cor-pink', 'cor-red', 'cor-yellow', 'cor-blue', 'cor-black'];
-    const elementTotal = document.getElementById('tarefas-total');
-    const elementCompleted = document.getElementById('tarefas-concluidas');
-    let storageListTask = this.getStorageTasks();
-    let currentNumberColor = 0;
-    const lastCheckboxclicked = {};
 }
 
-const listApp = new ListApp();
-listApp.init();
+class ColorPickerModal {
+    constructor(colorsClass, onSelectColor) {
+        this.colorsClass = colorsClass;
+        this.onSelectColor = onSelectColor;
+        this.currentTaskId = null;
+        this.modal = document.createElement('div');
+        this.modal.className = 'janela-muda-cor hidden';
+        this.#buildHTML();
+        this.#initEvents();
+    }
+
+    #buildHTML() {
+        const colorSpans = this.colorsClass.map((cor, index) => `
+            <span class="checkbox ${cor}" data-color-index="${index}"></span>
+        `).join('');
+
+        this.modal.innerHTML = `
+            <h2>Cores</h2>
+            <div class="janela-container">
+                ${colorSpans}
+            </div>
+        `;
+    }
+
+    init() {
+        if (!document.body.contains(this.modal)) { document.body.appendChild(this.modal) }
+    }
+
+    #initEvents() {
+        this.modal.addEventListener('click', (event) => {
+            const span = event.target.closest('.checkbox');
+
+            if (span && this.currentTaskId) {
+                const colorIndex = Number(span.dataset.colorIndex);
+                this.onSelectColor(this.currentTaskId, colorIndex);
+                this.close();
+            }
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!this.modal.contains(event.target)) {
+                this.close();
+            }
+        });
+    }
+
+    open(x, y, taskId) {
+        this.currentTaskId = taskId;
+        this.modal.style.left = `${x}px`;
+        this.modal.style.top = `${y}px`;
+        this.modal.classList.remove('hidden');
+    }
+
+    close() {
+        this.modal.classList.add('hidden');
+        this.currentTaskId = null;
+    }
+}
+
+const taskManager = new TaskManager();
+const taskPanel = new TaskPanel(taskManager);
+taskPanel.init();

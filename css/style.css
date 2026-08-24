@@ -63,7 +63,7 @@ body {
     flex-grow: 1;
 }
 
-.form input[type="button"] {
+.form button {
     background-color: #51ff7c;
     padding: 0.5rem;
     font-weight: 600;
@@ -78,7 +78,7 @@ body {
     outline: 2px solid black;
 }
 
-.form input[type="button"]:hover {
+.form button:hover {
     background-color: #01b306;
 }
 
@@ -279,3 +279,12 @@ footer {
 .cor-yellow { --cor-tema: #FFFF00; }
 .cor-blue   { --cor-tema: #274aff; }
 .cor-black { --cor-tema: #000000; }
+
+.hidden {
+    display: none !important;
+}
+
+.janela-muda-cor {
+    position: fixed;
+    z-index: 1000;
+}
