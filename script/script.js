@@ -235,13 +235,15 @@ class TaskPanel  {
 
     initDragAndDrop() {
         let draggedItem = null;
-
-        this.tasksContainer.addEventListener('mousedown', (event) => {
+        const prepareDrag = (event) => {
             const handle = event.target.closest('.drag-handle');
             const li = event.target.closest('.tarefas');
 
             if (li) { li.draggable = Boolean(handle) }
-        });
+        };
+
+        this.tasksContainer.addEventListener('mousedown', prepareDrag);
+        this.tasksContainer.addEventListener('touchstart', prepareDrag, { passive: true });
 
         // Quando começa a arrastar
         this.tasksContainer.addEventListener('dragstart', (event) => {
