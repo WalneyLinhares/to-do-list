@@ -298,3 +298,8 @@ footer {
     opacity: 0.4;
     cursor: grabbing;
 }
+
+.drag-handle {
+    touch-action: none;
+    user-select: none;
+}

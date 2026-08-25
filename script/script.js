@@ -210,8 +210,9 @@ class TaskPanel  {
 
     handleContextMenu(event) {
         const fatherElement = event.target.closest('.tarefas');
+        const labelElement = event.target.closest('.label-task');
 
-        if (fatherElement) {
+        if (fatherElement && labelElement) {
             event.preventDefault();
 
             const taskId = fatherElement.dataset.id;
@@ -235,32 +236,45 @@ class TaskPanel  {
     initDragAndDrop() {
         let draggedItem = null;
 
-        // Inicia a arrastagem
-        this.tasksContainer.addEventListener('dragstart', (event) => {
-            draggedItem = event.target.closest('.tarefas')
-            if (draggedItem) { draggedItem.classList.add('dragging'); }
+        this.tasksContainer.addEventListener('mousedown', (event) => {
+            const handle = event.target.closest('.drag-handle');
+            const li = event.target.closest('.tarefas');
+
+            if (li) { li.draggable = Boolean(handle) }
         });
 
-        // Termina a arrastagem
+        // Quando começa a arrastar
+        this.tasksContainer.addEventListener('dragstart', (event) => {
+            draggedItem = event.target.closest('.tarefas');
+
+            if (!draggedItem || !draggedItem.draggable) {
+                event.preventDefault();
+                return;
+            }
+
+            draggedItem.classList.add('dragging');
+        });
+
+        // Quando termina de arrastar
         this.tasksContainer.addEventListener('dragend', (event) => {
             if (draggedItem) {
                 draggedItem.classList.remove('dragging');
+                draggedItem.draggable = false;
                 draggedItem = null;
                 this.updateTasksOrder();
             }
         });
 
-        // Enquanto move o item
+        // Enquanto move o item por cima dos outros
         this.tasksContainer.addEventListener('dragover', (event) => {
             event.preventDefault();
 
-            const targetItem = event.target.closest('.tarefas')
+            const targetItem = event.target.closest('.tarefas');
 
-            if (targetItem && targetItem !== draggedItem) {
+            if (draggedItem && targetItem && targetItem !== draggedItem) {
                 const children = Array.from(this.tasksContainer.children);
                 const draggedIndex = children.indexOf(draggedItem);
                 const targetIndex = children.indexOf(targetItem);
-                console.log(children, draggedIndex, targetIndex);
 
                 if (draggedIndex < targetIndex) {
                     this.tasksContainer.insertBefore(draggedItem, targetItem.nextSibling);
@@ -268,7 +282,7 @@ class TaskPanel  {
                     this.tasksContainer.insertBefore(draggedItem, targetItem);
                 }
             }
-        })
+        });
     }
 
     updateTasksOrder() {
@@ -287,10 +301,10 @@ class TaskPanel  {
             const li = document.createElement('li');
             li.classList.add('tarefas');
             li.dataset.id = task.id;
-            li.draggable = true;
 
             li.innerHTML = `
-            <label>
+            <i class="drag-handle fa-solid fa-bars"></i>
+            <label class="label-task">
                 <input type="checkbox" ${task.isCompleted ? 'checked' : ''}>
                 <span class="checkbox ${this.taskManager.taskColorClass(task.color)}"></span>
                 <div class="container-title">
