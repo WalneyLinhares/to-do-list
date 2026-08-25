@@ -300,6 +300,8 @@ footer {
 }
 
 .drag-handle {
+    padding: 0.5rem;
+    align-items: center;
     touch-action: none;
     user-select: none;
 }

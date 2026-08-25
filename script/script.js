@@ -256,7 +256,7 @@ class TaskPanel  {
         });
 
         // Quando termina de arrastar
-        this.tasksContainer.addEventListener('dragend', (event) => {
+        this.tasksContainer.addEventListener('dragend', () => {
             if (draggedItem) {
                 draggedItem.classList.remove('dragging');
                 draggedItem.draggable = false;
@@ -303,7 +303,9 @@ class TaskPanel  {
             li.dataset.id = task.id;
 
             li.innerHTML = `
-            <i class="drag-handle fa-solid fa-bars"></i>
+            <div class="drag-handle">
+                <i class="fa-solid fa-bars"></i>
+            </div>
             <label class="label-task">
                 <input type="checkbox" ${task.isCompleted ? 'checked' : ''}>
                 <span class="checkbox ${this.taskManager.taskColorClass(task.color)}"></span>
