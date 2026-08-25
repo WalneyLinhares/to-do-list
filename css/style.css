@@ -288,3 +288,13 @@ footer {
     position: fixed;
     z-index: 1000;
 }
+
+.tarefas {
+    cursor: grab;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.tarefas.dragging {
+    opacity: 0.4;
+    cursor: grabbing;
+}

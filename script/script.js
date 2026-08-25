@@ -12,6 +12,7 @@ class TaskManager {
     #colorsClass = ['cor-orange', 'cor-purple', 'cor-cyan', 'cor-green',
         'cor-pink', 'cor-red', 'cor-yellow', 'cor-blue', 'cor-black'];
 
+
     constructor() {
         this.#loadFromLocalStorage();
     }
@@ -89,6 +90,11 @@ class TaskManager {
     taskColorClass(color) {
         return this.#colorsClass[color];
     }
+
+    reorderTasks(newOrderIds) {
+        this.#tasks = newOrderIds.map(id => this.#tasks.find(t => t.id === id));
+        this.#saveToLocalStorage();
+    }
 }
 
 class TaskPanel  {
@@ -116,6 +122,7 @@ class TaskPanel  {
         this.tasksContainer.addEventListener('contextmenu', (event) => this.handleContextMenu(event));
         this.colorModal.init();
         this.renderTasks();
+        this.initDragAndDrop();
     }
 
     formToAdd(event) {
@@ -225,6 +232,53 @@ class TaskPanel  {
         selection.addRange(range);
     }
 
+    initDragAndDrop() {
+        let draggedItem = null;
+
+        // Inicia a arrastagem
+        this.tasksContainer.addEventListener('dragstart', (event) => {
+            draggedItem = event.target.closest('.tarefas')
+            if (draggedItem) { draggedItem.classList.add('dragging'); }
+        });
+
+        // Termina a arrastagem
+        this.tasksContainer.addEventListener('dragend', (event) => {
+            if (draggedItem) {
+                draggedItem.classList.remove('dragging');
+                draggedItem = null;
+                this.updateTasksOrder();
+            }
+        });
+
+        // Enquanto move o item
+        this.tasksContainer.addEventListener('dragover', (event) => {
+            event.preventDefault();
+
+            const targetItem = event.target.closest('.tarefas')
+
+            if (targetItem && targetItem !== draggedItem) {
+                const children = Array.from(this.tasksContainer.children);
+                const draggedIndex = children.indexOf(draggedItem);
+                const targetIndex = children.indexOf(targetItem);
+                console.log(children, draggedIndex, targetIndex);
+
+                if (draggedIndex < targetIndex) {
+                    this.tasksContainer.insertBefore(draggedItem, targetItem.nextSibling);
+                } else {
+                    this.tasksContainer.insertBefore(draggedItem, targetItem);
+                }
+            }
+        })
+    }
+
+    updateTasksOrder() {
+        const newOrderIds = Array.from(this.tasksContainer.children).map(
+            li => li.dataset.id
+        );
+
+        this.taskManager.reorderTasks(newOrderIds);
+    }
+
     renderTasks() {
         this.tasksContainer.innerHTML = '';
         const tasks = this.taskManager.getTasks();
@@ -233,6 +287,7 @@ class TaskPanel  {
             const li = document.createElement('li');
             li.classList.add('tarefas');
             li.dataset.id = task.id;
+            li.draggable = true;
 
             li.innerHTML = `
             <label>
@@ -269,7 +324,7 @@ class ColorPickerModal {
         this.onSelectColor = onSelectColor;
         this.currentTaskId = null;
         this.modal = document.createElement('div');
-        this.modal.className = 'janela-muda-cor hidden';
+
         this.#buildHTML();
         this.#initEvents();
     }
@@ -288,7 +343,10 @@ class ColorPickerModal {
     }
 
     init() {
-        if (!document.body.contains(this.modal)) { document.body.appendChild(this.modal) }
+        if (!document.body.contains(this.modal)) {
+            document.body.appendChild(this.modal)
+            this.modal.className = 'janela-muda-cor hidden';
+        }
     }
 
     #initEvents() {
