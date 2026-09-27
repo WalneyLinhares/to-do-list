@@ -1,12 +1,13 @@
-# Dashboard Financeiro
+# Lista de Tarefas
 
-Aplicação web para visualização organizada de receitas, despesas e informações financeiras.
+Aplicação web para gerenciamento de tarefas, com funcionalidades de adicionar, organizar, concluir e remover itens.
 
 ## Funcionalidades
 
-- Cadastro de receitas e despesas
-- Visualização organizada das informações financeiras
-- Interface simples e responsiva
+- Adicionar novas tarefas
+- Marcar tarefas como concluídas
+- Remover tarefas
+- Organização da lista de tarefas
 
 ## Tecnologias utilizadas
 
@@ -18,8 +19,8 @@ Aplicação web para visualização organizada de receitas, despesas e informaç
 
 1. Clone o repositório
    ```bash
-   git clone https://github.com/WalneyLinhares/Dashboard-Finance.git
-   cd Dashboard-Finance
+   git clone https://github.com/WalneyLinhares/to-do-list.git
+   cd to-do-list
    ```
 
 2. Abra o arquivo `index.html` diretamente no navegador
@@ -33,7 +34,7 @@ Aplicação web para visualização organizada de receitas, despesas e informaç
 
 ## Demo
 
-Disponível em: https://walneylinhares.github.io/Dashboard-Finance/
+Disponível em: https://walneylinhares.github.io/to-do-list/
 
 ## Autor
 
